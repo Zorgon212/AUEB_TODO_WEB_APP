@@ -22,7 +22,7 @@ public class Todo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     @Column(name = "description")
     private String description;
 
@@ -35,7 +35,7 @@ public class Todo {
     @Column(name = "status")
     private boolean status;
     @Column(name= "user_id")
-    private int user_id;
+    private Integer user_id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
