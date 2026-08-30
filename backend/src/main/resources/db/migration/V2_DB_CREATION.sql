@@ -1,5 +1,5 @@
-CREATE DATABASE db123_todo_app;
-USE db123_todo_app;
+-- CREATE DATABASE todo_mysql_tasos;
+USE todo_mysql_tasos;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
