@@ -1,15 +1,18 @@
 package com.pireaus.todoWebApp.entities;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
+@Entity
+@Table(name = "users")
 public class User {
 
     public enum UserCategory{
@@ -28,11 +31,18 @@ public class User {
     private String password;
     @Column(name = "status")
     private boolean status;
+    @Enumerated(EnumType.STRING)
     @Column(name = "user_type")
     private String type;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Todo> todos = new ArrayList<>();
+
     public User(){
     }
+
+
 
 
     @Override
@@ -41,7 +51,7 @@ public class User {
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
+                ", password='" + "*".repeat(password.length()) + '\'' + // I hid the password
                 ", status='" + status + '\'' +
                 ", type='" + type + '\'' +
                 '}';
