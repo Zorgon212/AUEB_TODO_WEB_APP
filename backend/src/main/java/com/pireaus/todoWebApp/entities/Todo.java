@@ -34,8 +34,8 @@ public class Todo {
 
     @Column(name = "status")
     private boolean status;
-    @Column(name= "user_id")
-    private Integer user_id;
+//    @Column(name= "user_id")
+//    private Integer user_id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")

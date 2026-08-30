@@ -31,7 +31,7 @@ public class User {
     private String password;
     @Column(name = "status")
     private boolean status;
-    @Enumerated(EnumType.STRING)
+//    @Enumerated(EnumType.STRING)
     @Column(name = "user_type")
     private String type;
 
