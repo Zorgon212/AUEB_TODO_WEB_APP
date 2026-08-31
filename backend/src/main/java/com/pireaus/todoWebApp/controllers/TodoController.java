@@ -60,7 +60,7 @@ public class TodoController {
         return ResponseEntity.created(location).body(savedTodo);
     }
 
-    @DeleteMapping("/users/tasks/{taskId}")
+    @DeleteMapping("/users/tasks/{todoId}")
     public void deleteContact(@PathVariable Integer todoId){
         todoRepo.deleteById(todoId);
     }
