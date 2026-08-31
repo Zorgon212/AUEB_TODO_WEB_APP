@@ -2,6 +2,7 @@ package com.pireaus.todoWebApp.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,13 +28,14 @@ public class User {
     private String fullName;
     @Column(name = "email")
     private String email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password")
     private String password;
     @Column(name = "status")
     private boolean status;
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(name = "user_type")
-    private String type;
+    private UserCategory type;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
@@ -51,7 +53,7 @@ public class User {
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + "*".repeat(password.length()) + '\'' + // I hid the password
+                ", password='" + "********"+ '\'' + // I hid the password
                 ", status='" + status + '\'' +
                 ", type='" + type + '\'' +
                 '}';

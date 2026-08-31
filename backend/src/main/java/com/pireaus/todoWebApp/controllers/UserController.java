@@ -2,6 +2,7 @@ package com.pireaus.todoWebApp.controllers;
 
 import com.pireaus.todoWebApp.entities.User;
 import com.pireaus.todoWebApp.repo.UserRepo;
+import com.pireaus.todoWebApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,26 +15,50 @@ import java.util.Optional;
 @RestController
 public class UserController {
 
-    private UserRepo repo;
+//    private UserRepo repo;
+    private final UserRepo repo;
+    private final UserService userService;
+
+
+
     @Autowired
-    public void setUserRepository(UserRepo repo) {
+    public UserController(UserRepo repo, UserService userService) {
         this.repo = repo;
+        this.userService = userService;
     }
+
 
     @GetMapping("/users")
     public List<User> retrieveAllClients(){
         return repo.findAll();
     }
 
+//  user creation without security
+//    @PostMapping("/users")
+//    public ResponseEntity<User> createClient(@RequestBody User user){
+//        repo.save(user);
+//        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+//                .path("/{id}").buildAndExpand(user.getId()).toUri();
+//
+//        return ResponseEntity.created(location).build();
+//    }
+    // with security
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@RequestBody User user) {
 
-    @PostMapping("/users")
-    public ResponseEntity<User> createClient(@RequestBody User user){
-        repo.save(user);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(user.getId()).toUri();
+        User savedUser = userService.register(user);
 
-        return ResponseEntity.created(location).build();
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedUser.getId())
+                .toUri();
+
+        return ResponseEntity
+                .created(location)
+                .build();
     }
+
 
     @GetMapping("/users/{id}")
     public ResponseEntity<User> retrieveUser(@PathVariable Integer id){
@@ -64,9 +89,4 @@ public class UserController {
 
         return ResponseEntity.ok().location(location).body(updatedUser);
     }
-
-
-
-
-
 }

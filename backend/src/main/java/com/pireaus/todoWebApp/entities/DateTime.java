@@ -1,4 +1,4 @@
-// For later
+// Remember to continue later
 
 package com.pireaus.todoWebApp.entities;
 
