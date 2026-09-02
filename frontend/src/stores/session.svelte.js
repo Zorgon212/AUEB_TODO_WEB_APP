@@ -1,5 +1,15 @@
 import { api, login as apiLogin, logout as apiLogout } from '../lib/api.js';
 
+/**
+ * @typedef {Object} SessionUser
+ * @property {number} id
+ * @property {string} fullName
+ * @property {string} email
+ * @property {'USER' | 'ADMIN' | 'GUEST'} type
+ * @property {boolean} status
+ */
+
+/** @type {SessionUser | null} */
 let user = $state(null);
 let loaded = $state(false);
 
@@ -28,11 +38,20 @@ export const session = {
 		}
 	},
 
+	/**
+	 * @param {string} email
+	 * @param {string} password
+	 */
 	async login(email, password) {
 		await apiLogin(email, password);
 		await session.refresh();
 	},
 
+	/**
+	 * @param {string} fullName
+	 * @param {string} email
+	 * @param {string} password
+	 */
 	async register(fullName, email, password) {
 		await api.post('/register', { fullName, email, password });
 	},

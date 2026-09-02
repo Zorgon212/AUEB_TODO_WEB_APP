@@ -15,9 +15,5 @@
 </script>
 
 {#if session.isLoggedIn}
-	<nav>
-		<a href="/user">Dashboard</a>
-	</nav>
-
 	{@render children()}
 {/if}

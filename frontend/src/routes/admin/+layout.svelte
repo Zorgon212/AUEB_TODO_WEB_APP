@@ -17,9 +17,5 @@
 </script>
 
 {#if session.isAdmin}
-	<nav>
-		<a href="/admin">Dashboard</a>
-	</nav>
-
 	{@render children()}
 {/if}

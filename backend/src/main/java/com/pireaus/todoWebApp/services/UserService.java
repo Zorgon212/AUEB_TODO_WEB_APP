@@ -20,6 +20,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // self-registration - always a plain USER
     public User register(User user) {
 
         if (userRepo.findByEmail(user.getEmail()).isPresent()) {
@@ -32,6 +33,27 @@ public class UserService {
         );
 
         user.setType(User.UserCategory.USER);
+
+        user.setStatus(true);
+
+        return userRepo.save(user);
+    }
+
+    // admin-initiated creation - the admin may choose the role
+    public User createByAdmin(User user) {
+
+        if (userRepo.findByEmail(user.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException(
+                    "This email is already registered: " + user.getEmail());
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(user.getPassword())
+        );
+
+        if (user.getType() == null) {
+            user.setType(User.UserCategory.USER);
+        }
 
         user.setStatus(true);
 

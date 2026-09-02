@@ -27,22 +27,67 @@
 </script>
 
 {#if !session.loaded}
-	<p>Loading...</p>
+	<p class="status">Loading...</p>
 {:else if !session.isLoggedIn}
-	<h1>Welcome</h1>
+	<div class="welcome">
+		<h1>Welcome</h1>
 
-	<p>
-		Sign in to manage your todos.
-	</p>
+		<p>
+			Sign in to manage your todos.
+		</p>
 
-	<button onclick={openLogin}>Login</button>
-	<button onclick={openRegister}>Register</button>
+		<div class="actions">
+			<button onclick={openLogin}>Login</button>
+			<button onclick={openRegister}>Register</button>
+		</div>
 
-	{#if showLogin}
-		<LoginForm />
-	{/if}
+		{#if showLogin}
+			<LoginForm />
+		{/if}
 
-	{#if showRegister}
-		<RegisterForm />
-	{/if}
+		{#if showRegister}
+			<RegisterForm />
+		{/if}
+	</div>
 {/if}
+
+<style>
+	.status {
+		text-align: center;
+		margin-top: 3rem;
+	}
+
+	.welcome {
+		max-width: 420px;
+		margin: 4rem auto 2rem;
+		padding: 2.5rem 2rem;
+		text-align: center;
+		background: rgba(255, 255, 255, 0.9);
+		border-radius: 14px;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+	}
+
+	.welcome h1 {
+		margin-top: 0;
+	}
+
+	.actions {
+		display: flex;
+		justify-content: center;
+		gap: 10px;
+		margin-top: 1.25rem;
+	}
+
+	.actions button {
+		padding: 0.6rem 1.4rem;
+		border: none;
+		border-radius: 6px;
+		background: #333;
+		color: white;
+		cursor: pointer;
+	}
+
+	.actions button:hover {
+		background: #555;
+	}
+</style>

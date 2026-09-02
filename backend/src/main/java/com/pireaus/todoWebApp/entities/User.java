@@ -37,7 +37,8 @@ public class User {
     @Column(name = "user_type")
     private UserCategory type;
 
-    @OneToMany(mappedBy = "user")
+    // deleting a user deletes their todos too (admin "delete user" feature)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Todo> todos = new ArrayList<>();
 
