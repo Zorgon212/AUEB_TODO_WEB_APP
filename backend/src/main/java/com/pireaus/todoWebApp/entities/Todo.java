@@ -22,19 +22,24 @@ public class Todo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     @Column(name = "description")
     private String description;
 
-    // not sure if to keep them as datetime or int type to show in a separate datetime table
+    // remember to change later
+    @Column(name = "declared_time_id")
     private LocalDateTime creationDT;
+    @Column(name = "completion_time_id")
     private LocalDateTime completionDT;
 
     @Column(name = "status")
     private boolean status;
 
-    @Column(name= "user_id")
-    private int user_id;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
 
 
     public Todo() {

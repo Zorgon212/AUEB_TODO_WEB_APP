@@ -1,4 +1,5 @@
-package com.pireaus.todo;
+package com.pireaus.todoWebApp;
+
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
