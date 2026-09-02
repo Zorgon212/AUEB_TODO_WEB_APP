@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: "todo_mysql_tasos"
+      MYSQL_ROOT_PASSWORD: "P@ssw0rd"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pP@ssw0rd"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/todo_mysql_tasos"
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "P@ssw0rd"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    expose:
+      - "8080"
+    # uncomment to reach the API directly (bypassing nginx) while debugging:
+    # ports:
+    #   - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    expose:
+      - "3000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  mysql_data:
