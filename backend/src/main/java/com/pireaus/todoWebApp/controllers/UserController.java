@@ -5,12 +5,19 @@ import com.pireaus.todoWebApp.repo.UserRepo;
 import com.pireaus.todoWebApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
+/**
+ * Remember that the login controller was not added because spring security has a default login api call
+ * at POST /login
+ * with form parameters username, password
+ * */
 
 @RestController
 public class UserController {
@@ -31,6 +38,19 @@ public class UserController {
     @GetMapping("/users")
     public List<User> retrieveAllClients(){
         return repo.findAll();
+    }
+
+    // the currently logged in user - used by the frontend to know who's signed in
+    @GetMapping("/me")
+    public ResponseEntity<User> me(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        User user = repo.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found: " + authentication.getName()));
+
+        return ResponseEntity.ok(user);
     }
 
 //  user creation without security

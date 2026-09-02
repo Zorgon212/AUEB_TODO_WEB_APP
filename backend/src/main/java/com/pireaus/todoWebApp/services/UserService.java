@@ -1,6 +1,7 @@
 package com.pireaus.todoWebApp.services;
 
 import com.pireaus.todoWebApp.entities.User;
+import com.pireaus.todoWebApp.exceptions.EmailAlreadyExistsException;
 import com.pireaus.todoWebApp.repo.UserRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,11 @@ public class UserService {
     }
 
     public User register(User user) {
+
+        if (userRepo.findByEmail(user.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException(
+                    "This email is already registered: " + user.getEmail());
+        }
 
         user.setPassword(
                 passwordEncoder.encode(user.getPassword())
