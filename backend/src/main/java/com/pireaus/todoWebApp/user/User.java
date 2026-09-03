@@ -1,8 +1,8 @@
-package com.pireaus.todoWebApp.entities;
-
+package com.pireaus.todoWebApp.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pireaus.todoWebApp.todo.Todo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +10,11 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Aggregate root of the "user" boundary. A User owns its Todos - deleting a
+ * user deletes all of their todos too (cascade + orphanRemoval below), which
+ * is the one real consistency boundary this aggregate protects.
+ */
 @Getter
 @Setter
 @Entity
@@ -45,8 +50,26 @@ public class User {
     public User(){
     }
 
+    // --- domain behaviour --------------------------------------------------
+    // intention-revealing operations, so callers say *what* they mean
+    // (promote, change password, ...) instead of poking setters directly.
 
+    public boolean isAdmin() {
+        return type == UserCategory.ADMIN;
+    }
 
+    public boolean isSameUserAs(Integer otherId) {
+        return id != null && id.equals(otherId);
+    }
+
+    /** Expects an already-encoded password - hashing is an infrastructure concern, not the entity's. */
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
+    public void promoteTo(UserCategory newType) {
+        this.type = newType;
+    }
 
     @Override
     public String toString() {

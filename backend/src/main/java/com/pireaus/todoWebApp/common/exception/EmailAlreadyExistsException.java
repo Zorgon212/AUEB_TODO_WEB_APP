@@ -1,4 +1,4 @@
-package com.pireaus.todoWebApp.exceptions;
+package com.pireaus.todoWebApp.common.exception;
 
 public class EmailAlreadyExistsException extends RuntimeException {
     public EmailAlreadyExistsException(String message) {

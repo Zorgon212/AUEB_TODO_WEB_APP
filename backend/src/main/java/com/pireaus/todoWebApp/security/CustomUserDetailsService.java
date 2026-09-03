@@ -1,7 +1,7 @@
-package com.pireaus.todoWebApp.services;
+package com.pireaus.todoWebApp.security;
 
-import com.pireaus.todoWebApp.entities.User;
-import com.pireaus.todoWebApp.repo.UserRepo;
+import com.pireaus.todoWebApp.user.User;
+import com.pireaus.todoWebApp.user.UserRepo;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -40,4 +40,3 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .build();
     }
 }
-

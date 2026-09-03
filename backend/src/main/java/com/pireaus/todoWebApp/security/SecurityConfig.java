@@ -1,4 +1,4 @@
-package com.pireaus.todoWebApp.configurations;
+package com.pireaus.todoWebApp.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,9 +22,16 @@ public class SecurityConfig {
 
                         .requestMatchers("/register", "/login").permitAll()
 
+                        // Swagger / OpenAPI docs - public so they're browsable without logging in
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
                         // list-everything endpoints are admin only;
                         // per-user endpoints (/users/{id}, /users/{id}/tasks, /users/tasks/{todoId}, ...)
-                        // fall through to "authenticated" below and are checked in the controllers
+                        // fall through to "authenticated" below and are checked in the services
                         // (owner or admin), since a plain URL pattern can't tell "my own id" apart.
                         .requestMatchers("/users", "/clients/tasks")
                         .hasRole("ADMIN")
