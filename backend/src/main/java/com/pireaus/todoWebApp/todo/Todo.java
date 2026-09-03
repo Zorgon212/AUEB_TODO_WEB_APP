@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-// don't get confused, todo and task are the same thing!!
+// I use todo and task meaning the same thing!
 @Getter
 @Setter
 @Entity

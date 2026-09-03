@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS tasks (
     declared_time_id DATETIME,
     completion_time_id DATETIME ,
     -- foreign keys
-    CONSTRAINT fk_tasks_users FOREIGN KEY (user_id) REFERENCES users(id),
---     CONSTRAINT fk_tasks_declared_time FOREIGN KEY (declared_time_id) REFERENCES time(id),
-    CONSTRAINT fk_tasks_completion_time FOREIGN KEY (completion_time_id) REFERENCES time(id));
+    CONSTRAINT fk_tasks_users FOREIGN KEY (user_id) REFERENCES users(id)
+--     , CONSTRAINT fk_tasks_declared_time FOREIGN KEY (declared_time_id) REFERENCES time(id)
+--     , CONSTRAINT fk_tasks_completion_time FOREIGN KEY (completion_time_id) REFERENCES time(id)
+    );
 

@@ -2,8 +2,7 @@ package com.pireaus.todoWebApp.user.dto;
 
 import com.pireaus.todoWebApp.user.User;
 
-// Never carries the password - that's the whole point of having a response
-// DTO instead of serializing the entity straight back out over the wire.
+// No password
 public record UserResponse(
         Integer id,
         String fullName,

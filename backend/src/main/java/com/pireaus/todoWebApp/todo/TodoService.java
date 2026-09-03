@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-// application service: orchestrates the Todo entity + enforces "owner or
-// admin" access. Controllers stay thin HTTP adapters that just call in here.
 @Service
 public class TodoService {
 
