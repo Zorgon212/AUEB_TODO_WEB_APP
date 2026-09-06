@@ -1,0 +1,111 @@
+TodoApp / Task Manager Pro - How To Run The Tests
+==================================================
+
+There are two independent test suites:
+  - backend/src/test/java/...   - JUnit 5 + Mockito + AssertJ (15 tests)
+  - frontend/tests/*.e2e.js      - Playwright end-to-end tests (10 tests)
+
+Neither suite touches or depends on the other's process, but the Playwright
+suite DOES need the real backend + database running, since it drives the
+actual app through a browser. Read the "Playwright" section's prerequisites
+before running it.
+
+
+BACKEND - JUnit tests
+----------------------
+
+What they cover:
+  - user/UserTest.java          - User entity behaviour (role checks, id
+                                   comparison, password assignment) - 4 tests
+  - todo/TodoTest.java           - Todo entity behaviour, especially the
+                                   complete()/reopen() invariant - 4 tests
+  - user/UserServiceTest.java    - registration, duplicate-email rejection,
+                                   and the self-or-admin / admin-only
+                                   authorization guards, with the repository
+                                   and password encoder mocked out - 4 tests
+  - todo/TodoServiceTest.java     - todo creation, ownership enforcement, and
+                                   the completion-time-stamping flow, with the
+                                   repositories mocked out - 3 tests
+
+All 15 of the above are plain unit tests - no Spring context, no database,
+nothing else needs to be running for them. The one exception is the
+pre-existing TodoApplicationTests.java (a Spring context "does it boot"
+smoke test), which DOES need a real MySQL instance reachable exactly as
+configured in backend/src/main/resources/application.properties.
+
+How to run everything:
+
+    cd backend
+    ./mvnw test                     (Windows: mvnw.cmd test)
+
+If you don't have MySQL running locally and only want the 15 new unit tests
+(skipping the context-load smoke test), run:
+
+    ./mvnw test -Dtest="UserTest,TodoTest,UserServiceTest,TodoServiceTest"
+
+Results print to the console, and a per-class XML/TXT report is written to
+backend/target/surefire-reports/ after each run.
+
+
+FRONTEND - Playwright end-to-end tests
+----------------------------------------
+
+What they cover (10 tests total):
+  - tests/auth.e2e.js              - register with a new email, register with
+                                   a duplicate email, login with a wrong
+                                   password, login with valid credentials
+                                   and land on the user dashboard - 4 tests
+  - tests/todos.e2e.js              - add a todo, mark one completed, delete
+                                   one (each test logs in as its own fresh
+                                   throwaway user, created via the API, so
+                                   the three don't interfere with each
+                                   other) - 3 tests
+  - tests/access-control.e2e.js      - a logged-out visitor only sees
+                                   Login/Register, the default admin can log
+                                   in and reach /admin, a regular user is
+                                   redirected away from /admin - 3 tests
+
+PREREQUISITES - the backend must already be running and reachable at
+http://localhost:8080, backed by a real database, BEFORE you run these.
+The tests drive the actual frontend dev server in a real browser, which
+proxies API calls straight through to that backend (see the comment at the
+top of frontend/playwright.config.js). Two of the tests also depend on the
+default admin account (admin@todoApp.gr / P@ssw0rd) existing, which the
+V3__DEFAULT_ADMIN.sql Flyway migration creates automatically the first time
+the backend starts against the database.
+
+Easiest way to satisfy all of that: have MySQL running (with the
+`todo_mysql_tasos` database already created - see docker-compose.yml's
+comments, since the Docker deployment no longer runs a database service
+of its own), then from the project root:
+
+    docker compose up -d backend
+
+(or, without Docker: `cd backend && ./mvnw spring-boot:run` in one
+terminal, and leave it running).
+
+Then, in another terminal, from frontend/:
+
+    npm install                 (first time only)
+    npx playwright install      (first time only - downloads the test browsers)
+    npx playwright test
+
+Playwright starts the frontend dev server itself (per playwright.config.js's
+webServer entry) and shuts it down again when the run finishes - you don't
+need to start the frontend separately.
+
+After a run, see a readable HTML report of what passed/failed with:
+
+    npx playwright show-report
+
+Useful variations:
+  - Run one file only:        npx playwright test tests/auth.e2e.js
+  - Watch it happen in a real, visible browser window:
+                               npx playwright test --headed
+  - Step through interactively:
+                               npx playwright test --debug
+
+Each test run creates its own new user account(s) via the app (unique,
+timestamped emails), so re-running the suite repeatedly is safe and won't
+collide with earlier runs - it will just leave those throwaway accounts in
+the database.

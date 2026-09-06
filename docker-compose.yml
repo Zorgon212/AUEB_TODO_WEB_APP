@@ -1,26 +1,25 @@
 services:
-  mysql:
-    image: mysql:8.4
-    environment:
-      MYSQL_DATABASE: "todo_mysql_tasos"
-      MYSQL_ROOT_PASSWORD: "P@ssw0rd"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pP@ssw0rd"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+  # No mysql service here on purpose - the database is run independently,
+  # outside this compose file. Point SPRING_DATASOURCE_URL below at wherever
+  # you're running it:
+  #   - MySQL on the Windows/WSL host machine (outside Docker): use
+  #     host.docker.internal, as set below (Docker Desktop resolves this to
+  #     the host automatically, WSL2 backend included).
+  #   - MySQL in its own separately-run container: use that container's name
+  #     or IP instead, and make sure it's reachable from this compose
+  #     project's network (e.g. run it with the same --network, or via a
+  #     published port back through the host).
+  # Either way, the "todo_mysql_tasos" database itself must already exist
+  # before the backend starts - Flyway creates the tables inside it, but
+  # not the database itself, unlike the old mysql:8.4 image which did that
+  # automatically via MYSQL_DATABASE.
 
   backend:
     build: ./backend
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/todo_mysql_tasos"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://host.docker.internal:3306/todo_mysql_tasos"
       SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "P@ssw0rd"
-    depends_on:
-      mysql:
-        condition: service_healthy
     expose:
       - "8080"
     # uncomment to reach the API directly (bypassing nginx) while debugging:
@@ -43,6 +42,3 @@ services:
     depends_on:
       - backend
       - frontend
-
-volumes:
-  mysql_data:

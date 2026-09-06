@@ -1,0 +1,109 @@
+TodoApp / Task Manager Pro - Technology Stack
+==============================================
+(as of the current state of the v0.1 branch)
+
+
+ARCHITECTURE
+------------
+
+Overall: two-tier client-server architecture. A SvelteKit frontend
+(its own Node server after build) talks to a Spring Boot REST API
+over HTTP/JSON, authenticated with a server-side session cookie
+(no JWT). Not microservices - each side is a single deployable
+monolith, backed by one MySQL database.
+
+Backend named pattern:  Layered / N-tier architecture, applied as
+the classic Controller -> Service -> Repository -> Entity
+(Domain) chain on top of a RESTful API:
+  - Controller layer   - HTTP concerns, request/response mapping, auth checks
+  - Service layer       - business rules (duplicate-email check, admin vs
+                           self registration, etc.)
+  - Repository layer    - Spring Data JPA repositories (data access)
+  - Entity/Domain layer  - JPA-mapped model (User, Todo)
+  Cross-cutting: @RestControllerAdvice centralizes error handling
+  (EmailAlreadyExistsException, AccessDeniedException, etc. -> HTTP status).
+
+Frontend named pattern: Component-based architecture with
+file-system routing (SvelteKit's convention), plus a small
+centralized client-side store for auth/session state (a
+lightweight Flux/unidirectional-data-flow style: one `session`
+store is the single source of truth, components read from it and
+call its methods rather than mutating it directly). Folder
+structure follows the routes / lib / components / stores
+convention.
+
+
+BACKEND STACK
+-------------
+Language              Java 26
+Build tool             Maven (via the included mvnw wrapper)
+Framework              Spring Boot 4.1.1 (parent BOM manages all
+                        Spring transitive versions below)
+  - spring-boot-starter-webmvc     REST controllers (Spring MVC)
+  - spring-boot-starter-data-jpa   ORM / persistence (Hibernate, via JPA)
+  - spring-boot-starter-security   Auth - session/cookie-based form login,
+                                    BCrypt password hashing
+  - spring-boot-starter-flyway     Versioned SQL migrations
+  - spring-boot-devtools           Dev-time hot reload (runtime/optional)
+Database                MySQL (mysql-connector-j JDBC driver)
+Migrations               Flyway (flyway-mysql), files under
+                          backend/src/main/resources/db/migration
+Boilerplate reduction     Lombok (@Getter/@Setter etc.)
+Test starters             spring-boot-starter-data-jpa-test,
+                          -data-jdbc-test, -flyway-test, -jdbc-test,
+                          -webmvc-test
+
+Key backend design points:
+  - Session-cookie auth via Spring Security's default form login
+    (POST /login, application/x-www-form-urlencoded), not JWT.
+  - Password field uses @JsonProperty(access = WRITE_ONLY) so it can be
+    deserialized on input but is never serialized back out.
+  - Role model: USER / ADMIN / GUEST enum on the User entity.
+  - Ownership checks enforced in-controller (checkSelfOrAdmin) in addition
+    to SecurityConfig's route-level rules.
+  - Deleting a user cascades to delete their todos
+    (@OneToMany(cascade = ALL, orphanRemoval = true)).
+
+
+FRONTEND STACK
+--------------
+Framework                SvelteKit 2.63.x
+UI library                 Svelte 5.56.x (runes mode forced via
+                            vite.config.js compilerOptions - $state,
+                            $props, $derived, $effect)
+Build tool / dev server     Vite 8.0.x
+Build target / adapter      @sveltejs/adapter-node 5.5.x (produces a
+                            standalone Node server - not static hosting)
+Language tooling             JavaScript + JSDoc type annotations,
+                            type-checked via svelte-check 4.6.x /
+                            TypeScript 6.0.x (checkJs, no .ts files)
+E2E testing                   Playwright 1.60.x
+Packaging/lint utility          publint 0.3.x
+
+Key frontend design points:
+  - No external state-management library - a single hand-written
+    `session` store (Svelte 5 runes) tracks the logged-in user.
+  - No CSS framework - plain scoped <style> blocks per component.
+  - Dev-only same-origin proxy in vite.config.js forwards
+    /login, /logout, /register, /me, /users, /clients to the
+    backend so the session cookie is never cross-origin in dev.
+  - Route structure: routes/{admin,user}/... guarded in
+    +layout.svelte via onMount checks against the session store.
+
+
+DEPLOYMENT (Docker)
+--------------------
+  - backend/Dockerfile     multi-stage: eclipse-temurin:26-jdk (Maven
+                            build) -> eclipse-temurin:26-jre (run the jar)
+  - frontend/Dockerfile    multi-stage: node:22-alpine (npm ci + vite
+                            build) -> node:22-alpine (adapter-node output)
+  - nginx/nginx.conf        reverse proxy reproducing the dev proxy's
+                            routing rules for production
+  - docker-compose.yml       backend + frontend + nginx, one command -
+                            no mysql service: the database is run
+                            independently, outside this compose file (see
+                            the comment block at the top of the file), and
+                            reached via host.docker.internal by default
+  - Swagger/OpenAPI docs are reachable when running the backend directly,
+    but deliberately not exposed by the Docker deployment (nginx doesn't
+    route to them and the backend's port isn't published to the host)
