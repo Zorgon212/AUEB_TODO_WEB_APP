@@ -14,6 +14,9 @@ import java.util.List;
  * Aggregate root of the "user" boundary. A User owns its Todos - deleting a
  * user deletes all of their todos too (cascade + orphanRemoval below), which
  * is the one real consistency boundary this aggregate protects.
+ *
+ * ADMIN is not a different class, it is a type of user and guest was intended for trial
+ * with limited access but has not been implemented yet
  */
 @Getter
 @Setter
@@ -42,7 +45,9 @@ public class User {
     @Column(name = "user_type")
     private UserCategory type;
 
-    // deleting a user deletes their todos too (admin "delete user" feature)
+    // when deleting a user all of the tasks that bellong to this user will
+    // be deleted too regardless of the
+    // type of user
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Todo> todos = new ArrayList<>();
@@ -50,9 +55,6 @@ public class User {
     public User(){
     }
 
-    // --- domain behaviour --------------------------------------------------
-    // intention-revealing operations, so callers say *what* they mean
-    // (promote, change password, ...) instead of poking setters directly.
 
     public boolean isAdmin() {
         return type == UserCategory.ADMIN;
@@ -77,7 +79,7 @@ public class User {
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + "********"+ '\'' + // I hid the password
+                ", password='" + "********"+ '\'' + // I hid the password from here too
                 ", status='" + status + '\'' +
                 ", type='" + type + '\'' +
                 '}';

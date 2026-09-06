@@ -94,6 +94,12 @@ log in once via `POST /login` (`application/x-www-form-urlencoded`:
 its cookie jar enabled - before calling any endpoint other than
 `/register`/`/login`.
 
+Swagger UI is reachable this way when running the backend directly
+(`./mvnw spring-boot:run`, Option B below). It is deliberately NOT exposed
+by the Docker deployment (Option A) - nginx doesn't route to it and the
+backend's port isn't published to the host - so the deployed app doesn't
+expose its full API surface publicly.
+
 ## Default admin account
 
 A default administrator is seeded by the Flyway migration
@@ -107,22 +113,33 @@ database:
 
 ### Option A: Docker (recommended - one command, nothing to install)
 
-From this folder:
+This compose file deliberately does NOT include a database service - MySQL
+is expected to be run independently, outside Docker (see the comment block
+at the top of `docker-compose.yml` for exactly how). Before starting the
+stack:
+
+1. Have MySQL running and reachable, with a `todo_mysql_tasos` database
+   already created in it (Flyway creates the tables inside it on first
+   startup, but not the database itself).
+2. If it isn't running on the host machine at the default port with
+   `root`/`P@ssw0rd`, update `SPRING_DATASOURCE_URL` /
+   `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` under the
+   `backend` service in `docker-compose.yml` to match. The default
+   `host.docker.internal` hostname is how a container reaches a MySQL
+   instance running directly on the Windows/WSL host machine.
+
+Then, from this folder:
 
 ```
 docker compose up --build
 ```
 
-This builds and starts four containers - `mysql`, `backend`, `frontend`, and
-an `nginx` reverse proxy - and seeds the database via Flyway on first boot.
-Once it's up, open **http://localhost:8081** (nginx routes API paths to the
-backend and everything else to the frontend, so the session cookie behaves
-exactly as it does in local dev). `docker compose down` stops everything;
-add `-v` to also wipe the database volume.
-
-Environment variables the backend container reads (already set in
-`docker-compose.yml`, override there if needed): `SPRING_DATASOURCE_URL`,
-`SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`.
+This builds and starts three containers - `backend`, `frontend`, and an
+`nginx` reverse proxy. Once it's up, open **http://localhost:8081** (nginx
+routes API paths to the backend and everything else to the frontend, so the
+session cookie behaves exactly as it does in local dev). `docker compose
+down` stops everything - there's no database volume here to worry about
+wiping, since the database lives outside this compose project entirely.
 
 ### Option B: running locally without Docker
 
@@ -175,6 +192,6 @@ AUEB_TODO_WEB_APP/
 ├── backend/            Spring Boot REST API (see backend/pom.xml, Dockerfile)
 ├── frontend/            SvelteKit app (see frontend/package.json, Dockerfile)
 ├── nginx/nginx.conf      reverse proxy config used by docker-compose
-├── docker-compose.yml    mysql + backend + frontend + nginx, one command
+├── docker-compose.yml    backend + frontend + nginx, one command (DB is external)
 └── STACK.txt             detailed technology stack breakdown
 ```
