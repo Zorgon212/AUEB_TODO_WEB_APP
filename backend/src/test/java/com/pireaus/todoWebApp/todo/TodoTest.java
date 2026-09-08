@@ -10,12 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TodoTest {
 
     @Test
-    void assignToSetsTheOwnerAndStartsAsOpen() {
+    void setOwnerSetsTheOwnerAndStartsAsOpen() {
         User owner = new User();
         owner.setId(1);
         Todo todo = new Todo();
 
-        todo.assignTo(owner);
+        todo.setOwner(owner);
 
         assertThat(todo.getUser()).isEqualTo(owner);
         assertThat(todo.isStatus()).isFalse();
@@ -24,34 +24,34 @@ class TodoTest {
     }
 
     @Test
-    void completeMarksItDoneAndStampsTheCompletionTime() {
+    void taskCompletedMarksItDoneAndStampsTheCompletionTime() {
         Todo todo = new Todo();
 
-        todo.complete();
+        todo.taskCompleted();
 
         assertThat(todo.isStatus()).isTrue();
         assertThat(todo.getCompletionDT()).isNotNull();
     }
 
     @Test
-    void reopenClearsTheCompletionTime() {
+    void unTaskCompletedTaskClearsTheCompletionTime() {
         Todo todo = new Todo();
-        todo.complete();
+        todo.taskCompleted();
 
-        todo.reopen();
+        todo.unCompleteTask();
 
         assertThat(todo.isStatus()).isFalse();
         assertThat(todo.getCompletionDT()).isNull();
     }
 
     @Test
-    void belongsToComparesTheOwnersId() {
+    void ownsTaskComparesTheOwnersId() {
         User owner = new User();
         owner.setId(5);
         Todo todo = new Todo();
-        todo.assignTo(owner);
+        todo.setOwner(owner);
 
-        assertThat(todo.belongsTo(5)).isTrue();
-        assertThat(todo.belongsTo(6)).isFalse();
+        assertThat(todo.ownsTask(5)).isTrue();
+        assertThat(todo.ownsTask(6)).isFalse();
     }
 }

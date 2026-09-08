@@ -29,6 +29,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    private URI locationOf(Integer id) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/users/{id}")
+                .buildAndExpand(id)
+                .toUri();
+    }
+
     @Operation(summary = "List all users (admin only)")
     @GetMapping("/users")
     public List<UserResponse> retrieveAllClients(){
@@ -53,30 +60,28 @@ public class UserController {
         return ResponseEntity.created(locationOf(saved.id())).build();
     }
 
-    // admin-only: create a user with a chosen role (USER or ADMIN) - enforced by
-    // SecurityConfig's exact-path "/users" -> hasRole("ADMIN") rule
-    @Operation(summary = "Admin-only: create a user with a chosen role")
+    @Operation(summary = "create a user with (admin only)")
     @PostMapping("/users")
     public ResponseEntity<Void> createUser(@RequestBody CreateUserRequest request) {
         UserResponse saved = userService.createByAdmin(request);
         return ResponseEntity.created(locationOf(saved.id())).build();
     }
 
-    @Operation(summary = "Fetch a single user by id")
+    @Operation(summary = "Fetch user by id")
     @GetMapping("/users/{id}")
     public ResponseEntity<UserResponse> retrieveUser(@PathVariable Integer id){
         return ResponseEntity.ok(userService.findById(id));
     }
 
-    // admin-only - deleting a user also deletes their todos (cascade on User.todos)
-    @Operation(summary = "Admin-only: delete a user (cascades to their todos)")
+    // cascade deleting the tasks also
+    @Operation(summary = "delete a user (also deletes all the todos that belonged to that user) (only for admin)")
     @DeleteMapping("/users/{id}")
     public void deleteClient(@PathVariable Integer id, Authentication authentication){
         userService.delete(id, authentication.getName());
     }
 
-    // a user may update their own info; an admin may update anyone's.
-    @Operation(summary = "Update a user - self or admin; role/status/password changes require admin")
+    // an admin can also update other users
+    @Operation(summary = "Update a user by id")
     @PutMapping("/users/{id}")
     public ResponseEntity<UserResponse> updateClient(
             @PathVariable Integer id,
@@ -85,12 +90,5 @@ public class UserController {
     ) {
         UserResponse updated = userService.update(id, request, authentication.getName());
         return ResponseEntity.ok().location(locationOf(updated.id())).body(updated);
-    }
-
-    private URI locationOf(Integer id) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/users/{id}")
-                .buildAndExpand(id)
-                .toUri();
     }
 }

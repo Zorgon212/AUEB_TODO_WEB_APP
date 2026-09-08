@@ -60,7 +60,7 @@ class TodoServiceTest {
         User owner = existingUser(1, "owner@example.com", User.UserCategory.USER);
         Todo existing = new Todo();
         existing.setId(10);
-        existing.assignTo(owner);
+        existing.setOwner(owner);
 
         when(userRepo.findByEmail("owner@example.com")).thenReturn(Optional.of(owner));
         when(todoRepo.findById(10)).thenReturn(Optional.of(existing));

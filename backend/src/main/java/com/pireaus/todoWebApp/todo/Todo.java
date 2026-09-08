@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 // I use todo and task meaning the same thing!
@@ -13,60 +14,23 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tasks")
 public class Todo {
-
+    // Basic Structure
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "description")
     private String description;
-
     @Column(name = "declared_time_id")
     private LocalDateTime creationDT;
     @Column(name = "completion_time_id")
     private LocalDateTime completionDT;
-
     @Column(name = "status")
     private boolean status;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
     public Todo() {
-    }
-
-    // --- domain behaviour --------------------------------------------------
-
-    /** Assigns ownership and stamps the declared time - used only when a todo is first created. */
-    public void assignTo(User owner) {
-        this.user = owner;
-        this.creationDT = LocalDateTime.now();
-        this.status = false;
-        this.completionDT = null;
-    }
-
-    public boolean belongsTo(Integer userId) {
-        return user != null && user.getId() != null && user.getId().equals(userId);
-    }
-
-    public void updateDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * The one real invariant this entity protects: completionDT is set if
-     * and only if status is true. Every caller goes through complete()/
-     * reopen() instead of poking status/completionDT directly, so the two
-     * fields can never drift out of sync.
-     */
-    public void complete() {
-        this.status = true;
-        this.completionDT = LocalDateTime.now();
-    }
-
-    public void reopen() {
-        this.status = false;
-        this.completionDT = null;
     }
 
     @Override
@@ -78,4 +42,45 @@ public class Todo {
                 ", isActive=" + status +
                 '}';
     }
+
+    // extra stuff needed for logic
+
+    /** Assigns ownership and stamps the declared time - used only when a todo is first created. */
+    public void setOwner(User owner) {
+        this.user = owner;
+        this.creationDT = LocalDateTime.now();
+        this.status = false;
+        this.completionDT = null;
+    }
+
+    // true if user owns task and false if user does not own it
+    public boolean ownsTask(Integer userId) {
+        return user != null && user.getId() != null && user.getId().equals(userId);
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
+//     self explanatory
+    public void taskCompleted() {
+        this.status = true;
+        this.completionDT = LocalDateTime.now();
+    }
+
+    // returning the duration of the task if completed otherwise return null
+//    public Object taskDuration() {
+//        if (status == true){
+//            return (Duration.between(completionDT, creationDT).toHours());
+//        }
+//        return null;
+//    }
+
+    // if we want to unmark the task that was supposed to be completed
+    public void unCompleteTask() {
+        this.status = false;
+        this.completionDT = null;
+    }
+
+
 }

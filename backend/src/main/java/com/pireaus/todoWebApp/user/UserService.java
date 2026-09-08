@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-// application service: orchestrates the User aggregate + enforces who is
-// allowed to do what. Controllers stay thin HTTP adapters that just call in here.
+
 @Service
 public class UserService {
 
@@ -40,7 +39,7 @@ public class UserService {
         return UserResponse.from(getByEmailOrThrow(email));
     }
 
-    // self-registration - always a plain USER
+    // when registering through the
     public UserResponse register(RegisterUserRequest request) {
         assertEmailAvailable(request.email());
 

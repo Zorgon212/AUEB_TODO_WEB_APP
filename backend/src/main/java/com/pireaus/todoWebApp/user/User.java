@@ -79,7 +79,7 @@ public class User {
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + "********"+ '\'' + // I hid the password from here too
+                ", password='" + "********"+ '\'' + // I hid the password
                 ", status='" + status + '\'' +
                 ", type='" + type + '\'' +
                 '}';

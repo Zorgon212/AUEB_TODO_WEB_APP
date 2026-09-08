@@ -13,9 +13,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-// don't get confused, todo and task are the same thing!!
+// todo and task are the same thing
 @RestController
-@Tag(name = "Todos", description = "Per-user todo (task) management")
+@Tag(name = "Todos", description = "todo(task) api calls")
 public class TodoController {
 
     private final TodoService todoService;
@@ -24,28 +24,28 @@ public class TodoController {
         this.todoService = todoService;
     }
 
-    // all tasks for all users - admin only (enforced in SecurityConfig too)
-    @Operation(summary = "All todos for all users (admin only)")
+    // security configuration enforces it
+    @Operation(summary = "All todos for all users this can only be called from an admin account")
     @GetMapping("/clients/tasks")
     public List<TodoResponse> retrieveAllClients() {
         return todoService.findAll();
     }
 
     // todos belonging to one user - that user, or an admin
-    @Operation(summary = "Todos belonging to one user - that user, or an admin")
+    @Operation(summary = "Todos that belong to a specific user")
     @GetMapping("/users/{userId}/tasks")
     public List<TodoResponse> getTodosByUser(@PathVariable Integer userId, Authentication authentication) {
         return todoService.findAllForUser(userId, authentication.getName());
     }
 
     // a single todo - its owner, or an admin
-    @Operation(summary = "A single todo - its owner, or an admin")
+    @Operation(summary = "one todo returned based on its id")
     @GetMapping("/users/tasks/{todoId}")
     public ResponseEntity<TodoResponse> getTodo(@PathVariable Integer todoId, Authentication authentication) {
         return ResponseEntity.ok(todoService.findById(todoId, authentication.getName()));
     }
 
-    @Operation(summary = "Create a todo for a user - that user, or an admin")
+    @Operation(summary = "todo creation call")
     @PostMapping("/users/{userId}/tasks")
     public ResponseEntity<TodoResponse> createContact(
             @PathVariable Integer userId,
@@ -62,14 +62,14 @@ public class TodoController {
         return ResponseEntity.created(location).body(saved);
     }
 
-    @Operation(summary = "Delete a todo - its owner, or an admin")
+    @Operation(summary = "todo deletion call")
     @DeleteMapping("/users/tasks/{todoId}")
     public void deleteContact(@PathVariable Integer todoId, Authentication authentication) {
         todoService.delete(todoId, authentication.getName());
     }
 
-    // only an admin may alter another user's todo; everyone else may only alter their own
-    @Operation(summary = "Update a todo's description/completion - its owner, or an admin")
+    // simple users can only update their own, admin can update tasks belonging to others as well
+    @Operation(summary = "todo update call")
     @PutMapping("/users/tasks/{todoId}")
     public ResponseEntity<TodoResponse> updateContact(
             @PathVariable Integer todoId,

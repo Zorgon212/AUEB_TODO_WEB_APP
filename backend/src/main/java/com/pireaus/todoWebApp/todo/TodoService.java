@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@Service // service bean
 public class TodoService {
 
     private final TodoRepo todoRepo;
@@ -22,18 +22,18 @@ public class TodoService {
         this.userRepo = userRepo;
     }
 
-    // admin only (also enforced at the route level in SecurityConfig)
+    // admin only
     public List<TodoResponse> findAll() {
         return todoRepo.findAll().stream().map(TodoResponse::from).toList();
     }
 
-    // todos belonging to one user - that user, or an admin
+    // tasks which belong to one user
     public List<TodoResponse> findAllForUser(Integer userId, String actingUserEmail) {
         User current = currentUser(actingUserEmail);
         requireOwnerOrAdmin(current, userId);
 
         User owner = userRepo.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new NotFoundException("User with id = " + userId + " not found"));
 
         return owner.getTodos().stream().map(TodoResponse::from).toList();
     }
@@ -52,11 +52,11 @@ public class TodoService {
         requireOwnerOrAdmin(current, userId);
 
         User owner = userRepo.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new NotFoundException("User with id = " + userId + " not found"));
 
         Todo todo = new Todo();
         todo.setDescription(request.description());
-        todo.assignTo(owner);
+        todo.setOwner(owner);
 
         return TodoResponse.from(todoRepo.save(todo));
     }
@@ -73,9 +73,9 @@ public class TodoService {
         boolean nowCompleted = request.status();
 
         if (!wasCompleted && nowCompleted) {
-            existing.complete();
+            existing.taskCompleted();
         } else if (!nowCompleted) {
-            existing.reopen();
+            existing.unCompleteTask();
         }
 
         return TodoResponse.from(todoRepo.save(existing));
