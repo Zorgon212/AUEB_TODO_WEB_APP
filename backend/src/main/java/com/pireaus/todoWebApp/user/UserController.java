@@ -42,8 +42,8 @@ public class UserController {
         return userService.findAll();
     }
 
-    // the currently logged in user - used by the frontend to know who's signed in
-    @Operation(summary = "The currently logged-in user")
+    // the currently logged in user for frontend to know who's signed in
+    @Operation(summary = "The currently logged in user")
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(Authentication authentication) {
         if (authentication == null) {
@@ -52,15 +52,15 @@ public class UserController {
         return ResponseEntity.ok(userService.findCurrent(authentication.getName()));
     }
 
-    // self-registration - always creates a plain USER (see /users below for admin-created accounts)
-    @Operation(summary = "Self-registration - always creates a plain USER")
+    // register, can only register as a user
+    @Operation(summary = "register, can only register as a user")
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegisterUserRequest request) {
         UserResponse saved = userService.register(request);
         return ResponseEntity.created(locationOf(saved.id())).build();
     }
 
-    @Operation(summary = "create a user with (admin only)")
+    @Operation(summary = "create a user with only admin can use it")
     @PostMapping("/users")
     public ResponseEntity<Void> createUser(@RequestBody CreateUserRequest request) {
         UserResponse saved = userService.createByAdmin(request);
@@ -74,13 +74,13 @@ public class UserController {
     }
 
     // cascade deleting the tasks also
-    @Operation(summary = "delete a user (also deletes all the todos that belonged to that user) (only for admin)")
+    @Operation(summary = "delete a user (all this user's tasks are deleted as well)")
     @DeleteMapping("/users/{id}")
     public void deleteClient(@PathVariable Integer id, Authentication authentication){
         userService.delete(id, authentication.getName());
     }
 
-    // an admin can also update other users
+    // an admin can also update other users, users can only update themselves
     @Operation(summary = "Update a user by id")
     @PutMapping("/users/{id}")
     public ResponseEntity<UserResponse> updateClient(

@@ -15,9 +15,9 @@ public class OpenApiConfig {
                         .title("Task Manager Pro API")
                         .version("v1")
                         .description(
-                                "REST API for the Task Manager Pro todo application. " +
+                                "REST API for the Task Manager Pro application. " +
                                 "Auth is a session cookie from POST /login " +
-                                "(application/x-www-form-urlencoded: username, password) - " +
+                                "(username, password)" +
                                 "log in once from a client that keeps cookies (e.g. Postman) " +
                                 "before calling any endpoint below other than /register or /login."
                         )
