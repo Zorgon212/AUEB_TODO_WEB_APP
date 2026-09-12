@@ -48,6 +48,19 @@
 
 Πρέπει να υπάρχει ήδη μία βάση MySQL και να έχει γίνει παραμετροποίηση του docker-compose
 
+## Build ###############
+
+Backend:
+cd backend
+mvnw.cmd package
+(παράγει το εκτελέσιμο jar στο backend\target\*.jar)
+
+Frontend:
+cd frontend
+npm install
+npm run build
+(παράγει τον παραγωγικό φάκελο frontend\build)
+
 ## Εναλλακτικό Deployment ###############
 
 Πρώτα, δημιουργούμε μία βάση MySQL και παραμετροποιούμε το backend ώστε να επικοινωνεί με αυτή
