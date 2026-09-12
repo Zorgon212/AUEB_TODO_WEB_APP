@@ -1,10 +1,16 @@
 <script>
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import { session } from '../stores/session.svelte.js';
 	import UserMenu from '../components/UserMenu.svelte';
 	import notebookUrl from '$lib/images/notebook.webp';
+	import brownPaperUrl from '$lib/images/brownPaper.jpg';
 
 	let { children } = $props();
+
+	let bgUrl = $derived(session.isLoggedIn ? brownPaperUrl : notebookUrl);
+	let dashboardHref = $derived(session.isAdmin ? '/admin' : '/user');
+	let onDashboard = $derived(page.url.pathname === dashboardHref);
 
 	onMount(() => {
 		session.refresh();
@@ -15,9 +21,13 @@
 	<link rel="icon" type="image/webp" href={notebookUrl} />
 </svelte:head>
 
-<div class="app-bg" style="background-image: url({notebookUrl})">
+<div class="app-bg" style="background-image: url({bgUrl})">
 	<header class="topbar">
-		<div class="side"></div>
+		<div class="side">
+			{#if session.loaded && session.isLoggedIn && !onDashboard}
+				<a class="back" href={dashboardHref}>← Back to Dashboard</a>
+			{/if}
+		</div>
 
 		<a class="brand" href="/">Task Manager Pro</a>
 
@@ -57,6 +67,18 @@
 
 	.side.end {
 		justify-content: flex-end;
+	}
+
+	.back {
+		color: #1a56db;
+		text-decoration: none;
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+
+	.back:hover {
+		color: #123f9e;
+		text-decoration: underline;
 	}
 
 	.brand {

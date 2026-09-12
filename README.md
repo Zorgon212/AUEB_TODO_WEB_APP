@@ -170,5 +170,7 @@ Backend tests:
 χρειάζεται να τρέχει η βάση δεδομένων για ένα από τα τεστ.
 
 frontend tests:
- Ανοίγω το frontend στο vscode και κάνω npm install, npx playwright install, npx playwright test. Σε windows, πρέπει να εξαιρεθεί ο φάκελος από το windows defender γιατί δεν αφήνει το playwright να εγκατασταθεί σωστά.
-Για να τρέξουν τα τεστ στο frontend
+ Ανοίγω το frontend στο vscode και κάνω
+ npm install, npx playwright install, npx playwright test
+ Σε windows, πρέπει να εξαιρεθεί ο φάκελος από το windows defender γιατί δεν αφήνει το playwright να εγκατασταθεί σωστά.
+Για να τρέξουν τα τεστ στο frontend, χρειάζεται το backend και η βάση δεδομένων να έχουν σηκωθεί.

@@ -44,8 +44,6 @@
 
 <div class="page">
 	<div class="header">
-		<a href="/user" class="back">← Back to Dashboard</a>
-
 		<h1>My Information</h1>
 		<p>View and manage your account.</p>
 	</div>
@@ -129,17 +127,6 @@
 
 	.header {
 		margin-bottom: 25px;
-	}
-
-	.back {
-		display: inline-block;
-		margin-bottom: 20px;
-		color: #555;
-		text-decoration: none;
-	}
-
-	.back:hover {
-		color: #000;
 	}
 
 	h1 {
