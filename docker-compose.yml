@@ -7,12 +7,26 @@ services:
   backend:
     build: ./backend
     environment:
+
+
+      ###################
+      ##Παραμετροποίηση##
+      ##Εδώ##############
+      ###################
       SPRING_DATASOURCE_URL: "jdbc:mysql://host.docker.internal:3306/todo_mysql_tasos"
       SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "P@ssw0rd"
+      ##################
+      ##################
+      ##################
+
+    # Docker Desktop (Windows/Mac) resolves host.docker.internal automatically;
+    # plain Docker Engine (Linux, WSL included) needs this mapping to do the same.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     expose:
       - "8080"
-    # uncomment to reach the API directly (if you wish to bypass nginx)
+    # uncomment to reach the API directly (carefull! it bypasses nginx)
     # ports:
     #   - "8080:8080"
 

@@ -37,7 +37,8 @@
 6) git checkout v0.1
 !!!!Παραμετροποίηση του docker-compose τοπικά
 7) docker compose up --build -d
-8) από browser, πηγαίνουμε στη σελίδα http://localhost:8081/
+8) από browser, πηγαίνουμε στο URL http://localhost:8081/
+
 Τα container που σηκώνονται έτσι, είναι το backend, frontend, nginx
 
 Πρέπει να υπάρχει ήδη μία βάση MySQL και να έχει γίνει παραμετροποίηση του docker-compose
