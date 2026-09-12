@@ -34,7 +34,7 @@
 3) git init 
 4) git clone https://github.com/Zorgon212/AUEB_TODO_WEB_APP.git
 5) cd AUEB_TODO_WEB_APP
-6) git checkout v0.1
+6) git checkout v0.1 		(Το branch που είναι πλήρως λειτουργικό, είναι το v0.1)
 !!!!Παραμετροποίηση του docker-compose τοπικά
 7) docker compose up --build -d
 8) από browser, πηγαίνουμε στο URL http://localhost:8081/
